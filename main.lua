@@ -89,6 +89,22 @@ local Slider = MainTab:CreateSlider({
    end,
 })
 
+local JumpSlider = MainTab:CreateSlider({
+   Name = "Jump Power",
+   Range = {50, 500},
+   Increment = 10,
+   Suffix = "Power",
+   CurrentValue = 50,
+   Flag = "JumpSlider", -- Unique ID for config saving
+   Callback = function(Value)
+      local character = game.Players.LocalPlayer.Character
+      if character and character:FindFirstChild("Humanoid") then
+         character.Humanoid.UseJumpPower = true -- Ensures JumpPower is used instead of JumpHeight
+         character.Humanoid.JumpPower = Value
+      end
+   end,
+})
+
 local Button = MainTab:CreateButton({
    Name = "Fly",
    Callback = function()
