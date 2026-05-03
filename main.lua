@@ -44,9 +44,39 @@ Rayfield:Notify({
 },
 })
 
+local Tab = Window:CreateTab("Main", nil)
+
+-- Noclip Variables
+local Noclip = false
+local RunService = game:GetService("RunService")
+
+-- Noclip Toggle
+local Toggle = Tab:CreateToggle({
+   Name = "Noclip",
+   CurrentValue = false,
+   Flag = "NoclipToggle",
+   Callback = function(Value)
+      Noclip = Value
+   end,
+})
+
+-- Connection to handle collisions every frame
+RunService.Stepped:Connect(function()
+   if Noclip then
+      local character = game.Players.LocalPlayer.Character
+      if character then
+         for _, part in pairs(character:GetDescendants()) do
+            if part:IsA("BasePart") and part.CanCollide then
+               part.CanCollide = false
+            end
+         end
+      end
+   end
+end)
+
 local Slider = MainTab:CreateSlider({
    Name = "WalkSpeed Slider",
-   Range = {1, 250},
+   Range = {1, 350},
    Increment = 1,
    Suffix = "Speed",
    CurrentValue = 16,
