@@ -1,66 +1,67 @@
+-- Load Rayfield UI library
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
+-- Window Setup
 local Window = Rayfield:CreateWindow({
    Name = "🔥 Dragun Script Hub | Game 🔫",
-   LoadingTitle = "🔫 Jailbreak 💥",
+   LoadingTitle = "🔫 Dragun Hub 💥",
    LoadingSubtitle = "Prahlad",
    ConfigurationSaving = {
-      Enabled = True,
-      FolderName = nil, -- Create a custom folder for your hub/game
+      Enabled = true,
+      FolderName = nil, -- Folder for saving configurations
       FileName = "Dragun Hub"
    },
    Discord = {
       Enabled = false,
-      Invite = "noinvitelink", -- The Discord invite code, do not include discord.gg/. E.g. discord.gg/ABCD would be ABCD
-      RememberJoins = true -- Set this to false to make them join the discord every time they load it up
+      Invite = "noinvitelink", -- Discord invite link
+      RememberJoins = true
    },
-   KeySystem = true, -- Set this to true to use our key system
+   KeySystem = true, -- Key system setup
    KeySettings = {
       Title = "Key | Jailbreak",
       Subtitle = "Key System",
       Note = "Enjoyy",
-      FileName = "DragunHubKey1", -- It is recommended to use something unique as other scripts using Rayfield may overwrite your key file
-      SaveKey = true, -- The user's key will be saved, but if you change the key, they will be unable to use your script
-      GrabKeyFromSite = true, -- If this is true, set Key below to the RAW site you would like Rayfield to get the key from
-      Key = {"https://pastebin.com/raw/8DyY2D7Y"} -- List of keys that will be accepted by the system, can be RAW file links (pastebin, github etc) or simple strings ("hello","key22")
+      FileName = "DragunHubKey1",
+      SaveKey = true,
+      GrabKeyFromSite = true,
+      Key = {"https://pastebin.com/raw/8DyY2D7Y"} -- Key source
    }
 })
 
-local MainTab = Window:CreateTab("🏠 Home", nil) -- Title, Image
+-- Main Tab Setup
+local MainTab = Window:CreateTab("🏠 Home", nil)
 local MainSection = MainTab:CreateSection("Main")
 
+-- Notification when the script executes
 Rayfield:Notify({
    Title = "You executed the script",
    Content = "Very cool gui",
    Duration = 5,
    Image = 13047715178,
-   Actions = { -- Notification Buttons
+   Actions = {
       Ignore = {
          Name = "Okay!",
          Callback = function()
-         print("The user tapped Okay!")
-      end
-   },
-},
+            print("The user tapped Okay!")
+         end
+      }
+   }
 })
 
-local Tab = Window:CreateTab("Main", nil)
-
--- Noclip Variables
+-- Noclip Feature
 local Noclip = false
 local RunService = game:GetService("RunService")
 
--- Noclip Toggle
-local Toggle = Tab:CreateToggle({
+local Toggle = MainTab:CreateToggle({
    Name = "Noclip",
    CurrentValue = false,
    Flag = "NoclipToggle",
    Callback = function(Value)
       Noclip = Value
-   end,
+   end
 })
 
--- Connection to handle collisions every frame
+-- Noclip toggle functionality (Handles collision every frame)
 RunService.Stepped:Connect(function()
    if Noclip then
       local character = game.Players.LocalPlayer.Character
@@ -74,140 +75,181 @@ RunService.Stepped:Connect(function()
    end
 end)
 
+-- WalkSpeed Slider
+local WalkSpeed = 16
 local Slider = MainTab:CreateSlider({
    Name = "WalkSpeed Slider",
-   Range = {1, 350},
+   Range = {1, 250},
    Increment = 1,
    Suffix = "Speed",
-   CurrentValue = 16,
-   Flag = "sliderws", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   CurrentValue = WalkSpeed,
+   Flag = "sliderws", -- Unique ID for saving configurations
    Callback = function(Value)
-       local player = game.Players.LocalPlayer
+      local player = game.Players.LocalPlayer
       if player.Character and player.Character:FindFirstChild("Humanoid") then
          player.Character.Humanoid.WalkSpeed = Value
       end
    end,
 })
 
+-- JumpPower Slider
+local JumpPower = 50
 local JumpSlider = MainTab:CreateSlider({
    Name = "Jump Power",
    Range = {50, 500},
    Increment = 10,
    Suffix = "Power",
-   CurrentValue = 50,
+   CurrentValue = JumpPower,
    Flag = "JumpSlider", -- Unique ID for config saving
    Callback = function(Value)
       local character = game.Players.LocalPlayer.Character
       if character and character:FindFirstChild("Humanoid") then
-         character.Humanoid.UseJumpPower = true -- Ensures JumpPower is used instead of JumpHeight
+         character.Humanoid.UseJumpPower = true
          character.Humanoid.JumpPower = Value
       end
    end,
 })
 
+-- Infinite Jump Feature
+local InfiniteJumpEnabled = false
+game:GetService("UserInputService").JumpRequest:Connect(function()
+    if InfiniteJumpEnabled then
+        -- Trigger the jump when the user presses space, even if in mid-air
+        local player = game.Players.LocalPlayer
+        if player.Character and player.Character:FindFirstChild("Humanoid") then
+            player.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Physics)
+            player.Character.Humanoid:Move(Vector3.new(0, 100, 0))
+        end
+    end
+end)
+
+-- Infinite Jump Toggle Button
+local InfiniteJumpToggle = MainTab:CreateToggle({
+   Name = "Infinite Jump",
+   CurrentValue = false,
+   Flag = "InfiniteJumpToggle",
+   Callback = function(Value)
+      InfiniteJumpEnabled = Value
+   end
+})
+
+-- Fly Speed Slider (added)
+local FlySpeed = 100  -- Default fly speed
+local FlySpeedSlider = MainTab:CreateSlider({
+   Name = "Fly Speed",
+   Range = {16, 500},  -- Min and max values for fly speed
+   Increment = 1,      -- Adjust speed in increments of 1
+   Suffix = "Speed",   -- Unit label for the slider
+   CurrentValue = FlySpeed, -- Default value set to 100
+   Flag = "FlySpeedSlider", -- Unique ID for saving configurations
+   Callback = function(Value)
+      FlySpeed = Value  -- Update the fly speed when slider changes
+   end,
+})
+
+-- Fly Feature
 local Button = MainTab:CreateButton({
    Name = "Fly",
    Callback = function()
-        local FlyKey = Enum.KeyCode.V
-local SpeedKey = Enum.KeyCode.LeftControl
+      local FlyKey = Enum.KeyCode.V
+      local SpeedKey = Enum.KeyCode.LeftControl
 
-local SpeedKeyMultiplier = 3
-local FlightSpeed = 100
-local FlightAcceleration = 4
-local TurnSpeed = 16
+      local SpeedKeyMultiplier = 3
+      local FlightAcceleration = 4
+      local TurnSpeed = 16
 
+      local UserInputService = game:GetService("UserInputService")
+      local StarterGui = game:GetService("StarterGui")
+      local RunService = game:GetService("RunService")
+      local Players = game:GetService("Players")
+      local User = Players.LocalPlayer
+      local Camera = workspace.CurrentCamera
+      local UserCharacter = nil
+      local UserRootPart = nil
+      local Connection = nil
 
-local UserInputService = game:GetService("UserInputService")
-local StarterGui = game:GetService("StarterGui")
-local RunService = game:GetService("RunService")
-local Players = game:GetService("Players")
-local User = Players.LocalPlayer
-local Camera = workspace.CurrentCamera
-local UserCharacter = nil
-local UserRootPart = nil
-local Connection = nil
+      -- Set character on spawn
+      workspace.Changed:Connect(function()
+          Camera = workspace.CurrentCamera
+      end)
 
+      local setCharacter = function(c)
+          UserCharacter = c
+          UserRootPart = c:WaitForChild("HumanoidRootPart")
+      end
 
-workspace.Changed:Connect(function()
-    Camera = workspace.CurrentCamera
-end)
+      User.CharacterAdded:Connect(setCharacter)
+      if User.Character then
+          setCharacter(User.Character)
+      end
 
-local setCharacter = function(c)
-    UserCharacter = c
-    UserRootPart = c:WaitForChild("HumanoidRootPart")
-end
+      local CurrentVelocity = Vector3.new(0, 0, 0)
 
-User.CharacterAdded:Connect(setCharacter)
-if User.Character then
-    setCharacter(User.Character)
-end
+      local Flight = function(delta)
+          local BaseVelocity = Vector3.new(0, 0, 0)
+          if not UserInputService:GetFocusedTextBox() then
+              if UserInputService:IsKeyDown(Enum.KeyCode.W) then
+                  BaseVelocity = BaseVelocity + (Camera.CFrame.LookVector * FlySpeed)
+              end
+              if UserInputService:IsKeyDown(Enum.KeyCode.A) then
+                  BaseVelocity = BaseVelocity - (Camera.CFrame.RightVector * FlySpeed)
+              end
+              if UserInputService:IsKeyDown(Enum.KeyCode.S) then
+                  BaseVelocity = BaseVelocity - (Camera.CFrame.LookVector * FlySpeed)
+              end
+              if UserInputService:IsKeyDown(Enum.KeyCode.D) then
+                  BaseVelocity = BaseVelocity + (Camera.CFrame.RightVector * FlySpeed)
+              end
+              if UserInputService:IsKeyDown(Enum.KeyCode.Space) then
+                  BaseVelocity = BaseVelocity + (Camera.CFrame.UpVector * FlySpeed)
+              end
+              if UserInputService:IsKeyDown(SpeedKey) then
+                  BaseVelocity = BaseVelocity * SpeedKeyMultiplier
+              end
+          end
+          if UserRootPart then
+              local car = UserRootPart:GetRootPart()
+              if car.Anchored then return end
+              if not isnetworkowner(car) then return end
+              CurrentVelocity = CurrentVelocity:Lerp(
+                  BaseVelocity,
+                  math.clamp(delta * FlightAcceleration, 0, 1)
+              )
+              car.Velocity = CurrentVelocity + Vector3.new(0, 2, 0)
+              if car ~= UserRootPart then
+                  car.RotVelocity = Vector3.new(0, 0, 0)
+                  car.CFrame = car.CFrame:Lerp(CFrame.lookAt(
+                      car.Position,
+                      car.Position + CurrentVelocity + Camera.CFrame.LookVector
+                  ), math.clamp(delta * TurnSpeed, 0, 1))
+              end
+          end
+      end
 
-local CurrentVelocity = Vector3.new(0,0,0)
-local Flight = function(delta)
-    local BaseVelocity = Vector3.new(0,0,0)
-    if not UserInputService:GetFocusedTextBox() then
-        if UserInputService:IsKeyDown(Enum.KeyCode.W) then
-            BaseVelocity = BaseVelocity + (Camera.CFrame.LookVector * FlightSpeed)
-        end
-        if UserInputService:IsKeyDown(Enum.KeyCode.A) then
-            BaseVelocity = BaseVelocity - (Camera.CFrame.RightVector * FlightSpeed)
-        end
-        if UserInputService:IsKeyDown(Enum.KeyCode.S) then
-            BaseVelocity = BaseVelocity - (Camera.CFrame.LookVector * FlightSpeed)
-        end
-        if UserInputService:IsKeyDown(Enum.KeyCode.D) then
-            BaseVelocity = BaseVelocity + (Camera.CFrame.RightVector * FlightSpeed)
-        end
-        if UserInputService:IsKeyDown(Enum.KeyCode.Space) then
-            BaseVelocity = BaseVelocity + (Camera.CFrame.UpVector * FlightSpeed)
-        end
-    	if UserInputService:IsKeyDown(SpeedKey) then
-    		BaseVelocity = BaseVelocity * SpeedKeyMultiplier
-    	end
-    end
-    if UserRootPart then
-        local car = UserRootPart:GetRootPart()
-        if car.Anchored then return end
-        if not isnetworkowner(car) then return end
-        CurrentVelocity = CurrentVelocity:Lerp(
-            BaseVelocity,
-            math.clamp(delta * FlightAcceleration, 0, 1)
-        )
-        car.Velocity = CurrentVelocity + Vector3.new(0,2,0)
-        if car ~= UserRootPart then
-            car.RotVelocity = Vector3.new(0,0,0)
-            car.CFrame = car.CFrame:Lerp(CFrame.lookAt(
-                car.Position,
-                car.Position + CurrentVelocity + Camera.CFrame.LookVector
-            ), math.clamp(delta * TurnSpeed, 0, 1))
-        end
-    end
-end
+      UserInputService.InputBegan:Connect(function(userInput, gameProcessed)
+          if gameProcessed then return end
+          if userInput.KeyCode == FlyKey then
+              if Connection then
+                  StarterGui:SetCore("SendNotification", {
+                      Title = "DragunHub",
+                      Text = "Flight disabled"
+                  })
+                  Connection:Disconnect()
+                  Connection = nil
+              else
+                  StarterGui:SetCore("SendNotification", {
+                      Title = "DragunHub",
+                      Text = "Flight enabled"
+                  })
+                  CurrentVelocity = UserRootPart.Velocity
+                  Connection = RunService.Heartbeat:Connect(Flight)
+              end
+          end
+      end)
 
-UserInputService.InputBegan:Connect(function(userInput,gameProcessed)
-    if gameProcessed then return end
-    if userInput.KeyCode == FlyKey then
-        if Connection then
-            StarterGui:SetCore("SendNotification",{
-                Title = "PrahladHub",
-                Text = "Flight disabled"
-            })
-            Connection:Disconnect()
-            Connection = nil
-        else
-            StarterGui:SetCore("SendNotification",{
-                Title = "PrahladHub",
-                Text = "Flight enabled"
-            })
-            CurrentVelocity = UserRootPart.Velocity
-            Connection = RunService.Heartbeat:Connect(Flight)
-        end
-    end
-end)
-
-StarterGui:SetCore("SendNotification",{
-    Title = "PrahladHub",
-    Text = "Loaded successfully"
-})   
+      StarterGui:SetCore("SendNotification", {
+          Title = "DragunHub",
+          Text = "Loaded successfully"
+      })
    end,
 })
