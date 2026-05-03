@@ -51,7 +51,7 @@ local Button = MainTab:CreateButton({
 local SpeedKey = Enum.KeyCode.LeftControl
 
 local SpeedKeyMultiplier = 3
-local FlightSpeed = 150
+local FlightSpeed = 200
 local FlightAcceleration = 4
 local TurnSpeed = 16
 
