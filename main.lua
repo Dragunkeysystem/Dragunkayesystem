@@ -24,7 +24,7 @@ local Window = Rayfield:CreateWindow({
       FileName = "DragunHubKey1",
       SaveKey = true,
       GrabKeyFromSite = true,
-      Key = {"https://pastebin.com/raw/8DyY2D7Y"} -- Key source
+      Key = {"https://pastebin.com/raw/ykXLyFRB"} -- Key source
    }
 })
 
