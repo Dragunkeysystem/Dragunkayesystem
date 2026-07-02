@@ -31,7 +31,7 @@ Frame.Draggable = true
 
 local Title = Instance.new("TextLabel")
 Title.Parent = Frame
-Title.Text = "Fx P4lad Key System"
+Title.Text = "DragunHub Key System"
 Title.Font = Enum.Font.SourceSansBold
 Title.TextSize = 22
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
