@@ -9,132 +9,53 @@ local UserInputService = game:GetService("UserInputService")
 local player = Players.LocalPlayer
 local Camera = workspace.CurrentCamera
 
---// PREVENT MULTIPLE KEY UIS
+--// PREVENT OLD MULTIPLE KEY UIS (Just in case they rerun the old script)
 if game.CoreGui:FindFirstChild("KeySystemGUI") then
     game.CoreGui.KeySystemGUI:Destroy()
 end
 
---// KEY SYSTEM UI
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "KeySystemGUI"
-ScreenGui.ResetOnSpawn = false
-ScreenGui.Parent = game.CoreGui
+--// LOAD FLUENT UI
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 
-local Frame = Instance.new("Frame")
-Frame.Parent = ScreenGui
-Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-Frame.BorderSizePixel = 0
-Frame.Position = UDim2.new(0.35, 0, 0.3, 0)
-Frame.Size = UDim2.new(0, 320, 0, 230)
-Frame.Active = true
-Frame.Draggable = true
+--// WINDOW SETUP (Modern with Acrylic Blur)
+local Window = Fluent:CreateWindow({
+    Title = "Dragun Script Hub",
+    SubTitle = "DragunHub | by Prahlad",
+    TabWidth = 160,
+    Size = UDim2.fromOffset(580, 460),
+    Acrylic = true, -- Enables the modern frosted glass effect
+    Theme = "Amethyst",
+    MinimizeKey = Enum.KeyCode.LeftControl
+})
 
-local Title = Instance.new("TextLabel")
-Title.Parent = Frame
-Title.Text = "DragunHub Key System"
-Title.Font = Enum.Font.SourceSansBold
-Title.TextSize = 22
-Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-Title.BorderSizePixel = 0
-Title.Size = UDim2.new(1, 0, 0, 32)
+--// INITIAL TABS (Only the Lock Screen is visible at first)
+local Tabs = {
+    KeySystem = Window:AddTab({ Title = "Authentication", Icon = "lock" })
+}
 
-local KeyBox = Instance.new("TextBox")
-KeyBox.Parent = Frame
-KeyBox.PlaceholderText = "Enter your key..."
-KeyBox.Text = ""
-KeyBox.Font = Enum.Font.SourceSans
-KeyBox.TextSize = 18
-KeyBox.Position = UDim2.new(0.08, 0, 0.30, 0)
-KeyBox.Size = UDim2.new(0.84, 0, 0, 32)
-KeyBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-KeyBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-KeyBox.ClearTextOnFocus = false
+Window:SelectTab(1)
 
-local VerifyButton = Instance.new("TextButton")
-VerifyButton.Parent = Frame
-VerifyButton.Text = "Verify Key"
-VerifyButton.Font = Enum.Font.SourceSansBold
-VerifyButton.TextSize = 18
-VerifyButton.Position = UDim2.new(0.08, 0, 0.52, 0)
-VerifyButton.Size = UDim2.new(0.84, 0, 0, 32)
-VerifyButton.BackgroundColor3 = Color3.fromRGB(0, 170, 0)
-VerifyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+local HubLoaded = false
 
-local GetKeyButton = Instance.new("TextButton")
-GetKeyButton.Parent = Frame
-GetKeyButton.Text = "Get Key"
-GetKeyButton.Font = Enum.Font.SourceSansBold
-GetKeyButton.TextSize = 18
-GetKeyButton.Position = UDim2.new(0.08, 0, 0.70, 0)
-GetKeyButton.Size = UDim2.new(0.84, 0, 0, 32)
-GetKeyButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
-GetKeyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+--// MAIN HUB FUNCTION (Runs only after correct key)
+local function LoadMainFeatures()
+    if HubLoaded then return end
+    HubLoaded = true
 
-local Notification = Instance.new("TextLabel")
-Notification.Parent = Frame
-Notification.Text = ""
-Notification.Font = Enum.Font.SourceSansBold
-Notification.TextSize = 16
-Notification.Position = UDim2.new(0.08, 0, 0.88, 0)
-Notification.Size = UDim2.new(0.84, 0, 0, 24)
-Notification.TextColor3 = Color3.fromRGB(255, 255, 255)
-Notification.BackgroundTransparency = 1
-Notification.TextWrapped = true
+    -- Create the hidden tabs now that the user is authenticated
+    Tabs.Main = Window:AddTab({ Title = "Home", Icon = "home" })
+    Tabs.Paint = Window:AddTab({ Title = "Paint to hide", Icon = "brush" })
 
---// HELPER: notification
-local function notify(msg, duration)
-    Notification.Text = msg
-    task.delay(duration or 1.5, function()
-        if Notification then
-            Notification.Text = ""
-        end
-    end)
-end
-
---// GET KEY BUTTON (copies link for executors with setclipboard)
-GetKeyButton.MouseButton1Click:Connect(function()
-    if setclipboard then
-        setclipboard(GET_KEY_URL)
-        notify("Key link copied to clipboard!", 1.5)
-    else
-        notify("Open this link for key:\n" .. GET_KEY_URL, 3)
-    end
-end)
-
---// MAIN HUB FUNCTION (runs after correct key)
-local function LoadDragunHub()
-    -- destroy key UI first
-    if ScreenGui then
-        ScreenGui:Destroy()
-    end
-
-    -- load Fluent
-    local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
-    local User = player
-
-    -- Window Setup
-    local Window = Fluent:CreateWindow({
-        Title = "Dragun Script Hub",
-        SubTitle = "AI Edition | by Prahlad",
-        TabWidth = 160,
-        Size = UDim2.fromOffset(580, 460),
-        Acrylic = false,
-        Theme = "Dark",
-        MinSize = Vector2.new(470, 380)
-    })
-
-    -- Tabs Setup
-    local Tabs = {
-        Main = Window:AddTab({ Title = "Home", Icon = "home" }),
-        Paint = Window:AddTab({ Title = "Paint to hide", Icon = "brush" })
-    }
+    -- Switch to the Main tab
+    Window:SelectTab(2)
 
     Fluent:Notify({
         Title = "Executed Successfully",
         Content = "Welcome to Dragun Hub! UI fully loaded.",
         Duration = 3
     })
+
+    local User = player
 
     --=========================================
     -- [HOME TAB] FEATURE: Noclip
@@ -397,25 +318,52 @@ local function LoadDragunHub()
     end)
 end
 
---// VERIFY KEY BUTTON LOGIC
-VerifyButton.MouseButton1Click:Connect(function()
-    local userInput = tostring(KeyBox.Text or "")
+--=========================================
+-- KEY SYSTEM LOGIC (Fluent Style)
+--=========================================
 
-    -- trim spaces and ignore case
-    userInput = userInput:gsub("^%s+", ""):gsub("%s+$", "")
-    local correct = CORRECT_KEY:gsub("^%s+", ""):gsub("%s+$", "")
-    userInput = string.lower(userInput)
-    correct = string.lower(correct)
+Tabs.KeySystem:AddParagraph({
+    Title = "Key Required",
+    Content = "You must enter a key to access Dragun Hub. Click below to copy the link."
+})
 
-    if userInput == "" then
-        notify("Please enter a key.", 1.5)
-        return
+Tabs.KeySystem:AddButton({
+    Title = "Copy Key Link",
+    Description = "Copies the link to get your key to your clipboard.",
+    Callback = function()
+        if setclipboard then
+            setclipboard(GET_KEY_URL)
+            Fluent:Notify({ Title = "Copied", Content = "Key link copied to clipboard!", Duration = 2 })
+        else
+            Fluent:Notify({ Title = "Error", Content = "Your executor does not support setclipboard.", Duration = 2 })
+        end
     end
+})
 
-    if userInput == correct then
-        notify("Key correct! Loading script...", 1.5)
-        task.delay(0.5, LoadDragunHub)
-    else
-        notify("Incorrect key!", 1.5)
+local KeyInput = Tabs.KeySystem:AddInput("KeyInput", {
+    Title = "Enter Access Key",
+    Description = "Type or paste your key here.",
+    Default = "",
+    Placeholder = "Enter key...",
+    Numeric = false,
+    Finished = false,
+    Callback = function(Value)
+        local userInput = string.lower(Value:gsub("^%s+", ""):gsub("%s+$", ""))
+        local correct = string.lower(CORRECT_KEY:gsub("^%s+", ""):gsub("%s+$", ""))
+
+        if userInput == correct then
+            Fluent:Notify({
+                Title = "Access Granted",
+                Content = "Key correct! Loading script...",
+                Duration = 1.5
+            })
+            task.delay(0.5, LoadMainFeatures)
+        elseif userInput ~= "" then
+            Fluent:Notify({
+                Title = "Access Denied",
+                Content = "Incorrect key. Please try again.",
+                Duration = 2
+            })
+        end
     end
-end)
+})
